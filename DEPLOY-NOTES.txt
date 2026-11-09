@@ -1,0 +1,14 @@
+Render deploy settings (if not using Blueprint):
+Runtime: Node
+Build command: npm install
+Start command: npm start
+Health check path: /api/status
+Environment:
+  GEMINI_API_KEY = your private key
+  GEMINI_MODEL = gemini-2.5-flash
+  MAX_UPLOAD_GB = 2
+  UPLOAD_DIR = /var/data
+Persistent Disk:
+  Mount path: /var/data
+  Size: 10 GB (or larger than the temporary upload you expect)
+The web service must be on a paid plan to attach a persistent disk.
