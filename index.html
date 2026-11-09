@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Subtitle Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#121725;--line:#263149;--text:#edf2ff;--muted:#9aa8c2;--accent:#7c5cff;--green:#36d399}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#1b2040 0,transparent 35%),var(--bg);color:var(--text);font:15px system-ui,sans-serif}
+main{max-width:980px;margin:auto;padding:22px 16px 60px}.top{display:flex;align-items:center;gap:12px;margin:8px 0 24px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#7657ff,#20c7b7);display:grid;place-items:center;font-size:23px}
+h1{font-size:23px;margin:0}small,.muted{color:var(--muted)}.panel{background:linear-gradient(145deg,#151c2c,#101522);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}
+h2{font-size:17px;margin:0 0 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;color:#bdc9df;font-size:13px;margin-bottom:7px}input,select,textarea{width:100%;background:#090e19;border:1px solid #33405a;border-radius:10px;padding:12px;color:var(--text);font:inherit}
+input[type=file]{padding:14px;border-style:dashed}button{border:0;border-radius:11px;padding:13px 18px;background:var(--accent);color:white;font-weight:700;font-size:15px;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}.secondary{background:#27334b}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+#status{margin-top:12px;color:var(--muted);white-space:pre-wrap}#srt{min-height:280px;line-height:1.5;font-family:ui-monospace,monospace}
+video{width:100%;max-height:420px;background:#05070b;border-radius:12px;margin-top:12px}
+.progress{height:8px;background:#222c40;border-radius:10px;overflow:hidden;margin-top:12px}.bar{height:100%;width:0;background:linear-gradient(90deg,#795cff,#34d6bb);transition:width .3s}
+.note{font-size:12px;color:var(--muted);line-height:1.6}.pill{display:inline-block;border:1px solid #33405a;padding:4px 9px;border-radius:99px;color:#b9c6df;font-size:12px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}main{padding:16px 12px 40px}}
+</style>
+</head>
+<body><main>
+<header class="top"><div class="logo">字幕</div><div><h1>AI Subtitle Studio</h1><small>Chinese → Myanmar Video Translator</small></div><span class="pill" style="margin-left:auto">Dark Studio</span></header>
+<section class="panel">
+<h2>① Gemini API ချိတ်ဆက်မှု</h2>
+<p id="connection" class="muted">Server အခြေအနေ စစ်ဆေးနေပါတယ်…</p>
+<p class="note">Online မှာ API Key ကို Hosting Dashboard ရဲ့ Environment Variables ထဲမှာသာ ထည့်ပါ။ Website ထဲကနေ Key ကို အများမြင်အောင် မထည့်ပါနှင့်။ API Key ယူရန် <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:#a99aff">Google AI Studio ဖွင့်ရန် ↗</a></p>
+</section>
+<section class="panel">
+<h2>② Video Upload</h2>
+<label for="video">ဘာသာပြန်လိုသော Video ဖိုင်</label>
+<input id="video" type="file" accept="video/*">
+<div class="note" id="limit">Upload limit စစ်ဆေးနေပါတယ်…</div>
+<video id="preview" controls hidden></video>
+<div class="grid" style="margin-top:16px">
+<div><label for="language">ဘာသာပြန်မည့်ဘာသာ</label><select id="language"><option value="Burmese">မြန်မာဘာသာ</option><option value="English">English</option></select></div>
+<div><label for="style">ဘာသာပြန်ပုံစံ</label><select id="style"><option value="natural conversational">သဘာဝကျတဲ့ နေ့စဉ်စကားပြောပုံစံ</option><option value="accurate and concise">တိကျပြီး တိုတိုရှင်းရှင်း</option></select></div>
+</div>
+<div class="actions"><button id="go">ဘာသာပြန်မယ်</button><button class="secondary" id="clear">ရှင်းလင်းမယ်</button></div>
+<div class="progress"><div class="bar" id="bar"></div></div><div id="status">Video ရွေးပြီး ဘာသာပြန်နိုင်ပါတယ်။</div>
+</section>
+<section class="panel">
+<h2>③ Subtitle Editor</h2>
+<label for="srt">SRT စာသား (ပြင်ဆင်နိုင်သည်)</label>
+<textarea id="srt" placeholder="ဘာသာပြန်ပြီးသော SRT စာသား ဒီနေရာမှာ ပေါ်လာပါမယ်…"></textarea>
+<div class="actions"><button id="download">SRT Download</button><button class="secondary" id="copy">Copy SRT</button></div>
+<p class="note">မှတ်ချက် — AI ရဲ့ timestamp နဲ့ စာသားတွေကို ပြန်စစ်ပါ။ မော်ဒယ်ရဲ့ Video processing ကန့်သတ်ချက်၊ အချိန်နှင့် API quota ကြောင့် အလွန်ရှည်တဲ့ Video တစ်ခုလုံးကို တစ်ကြိမ်တည်း မပြီးနိုင်တာရှိနိုင်ပါတယ်။</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let previewUrl=null;
+async function init(){try{const r=await fetch('/api/status');const d=await r.json();$('connection').textContent=d.ready?`Gemini ချိတ်ဆက်ရန် အသင့်ဖြစ်နေပါပြီ · ${d.model}`:'API Key မထည့်ရသေးပါ။ Server folder ထဲက .env ဖိုင်ကို ပြင်ပါ။';$('limit').textContent=`အများဆုံး ${d.maxUploadGB} GB အထိ (Server storage နှင့် Google API ကန့်သတ်ချက်များလည်း သက်ဆိုင်သည်)`;}catch{$('connection').textContent='Server မဖွင့်ရသေးပါ။ README ကိုကြည့်ပြီး Server စတင်ပါ။';}}
+$('video').addEventListener('change',()=>{const f=$('video').files[0];if(!f)return;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(f);$('preview').src=previewUrl;$('preview').hidden=false;$('status').textContent=`ရွေးထားသောဖိုင်: ${f.name} · ${(f.size/1024/1024/1024).toFixed(2)} GB`;});
+$('go').onclick=async()=>{const f=$('video').files[0];if(!f){$('status').textContent='Video ဖိုင်ရွေးပေးပါ။';return;}
+$('go').disabled=true;$('bar').style.width='8%';$('status').textContent='Server သို့ Video ပို့နေပါတယ်။ ဖိုင်ကြီးလျှင် အချိန်ကြာနိုင်ပါတယ်…';
+const form=new FormData();form.append('video',f);form.append('targetLanguage',$('language').value);form.append('style',$('style').value);
+let p=8;const ticker=setInterval(()=>{p=Math.min(p+1,90);$('bar').style.width=p+'%';},2500);
+try{const r=await fetch('/api/translate-video',{method:'POST',body:form});const d=await r.json();if(!r.ok)throw new Error(d.error||'Request မအောင်မြင်ပါ။');$('srt').value=d.srt;$('bar').style.width='100%';$('status').textContent='ပြီးပါပြီ။ SRT ကို စစ်ဆေးပြီး Download လုပ်နိုင်ပါတယ်။ '+(d.note||'');}
+catch(e){$('status').textContent='အမှား: '+e.message;$('bar').style.width='0%';}
+finally{clearInterval(ticker);$('go').disabled=false;}};
+$('clear').onclick=()=>{$('video').value='';$('srt').value='';$('preview').removeAttribute('src');$('preview').hidden=true;$('bar').style.width='0%';$('status').textContent='ရှင်းလင်းပြီးပါပြီ။';};
+$('download').onclick=()=>{const blob=new Blob([$('srt').value],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='myanmar-subtitles.srt';a.click();URL.revokeObjectURL(a.href);};
+$('copy').onclick=async()=>{await navigator.clipboard.writeText($('srt').value);$('status').textContent='SRT ကို Copy လုပ်ပြီးပါပြီ။';};
+init();
+</script></body></html>
